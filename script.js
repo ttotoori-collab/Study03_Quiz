@@ -188,8 +188,11 @@ function renderQuestion() {
   round.answered = false;
   round.usedHint = false;
 
+  document.getElementById("status-label").textContent =
+    getCategory(round.categoryId).name + " · " + MODES[round.mode].name;
   document.getElementById("quiz-progress").textContent =
     (round.index + 1) + " / " + round.questions.length;
+  renderStatusScore();
   document.getElementById("quiz-text").textContent = question.text;
 
   var list = document.getElementById("choice-list");
@@ -204,10 +207,11 @@ function renderQuestion() {
   }
 
   document.getElementById("feedback").classList.add("hidden");
+  document.getElementById("btn-next").disabled = false;
+}
 
-  var next = document.getElementById("btn-next");
-  next.classList.add("hidden");
-  next.disabled = false;
+function renderStatusScore() {
+  document.getElementById("status-score").textContent = "점수 " + formatScore(totalScore(round));
 }
 
 /* 정답 여부 → 한 줄 해설 → 출처 행 → [다음].
@@ -219,18 +223,19 @@ function renderFeedback(choiceIndex, correct, timedOut) {
   for (var i = 0; i < buttons.length; i++) {
     buttons[i].disabled = true;
   }
-  buttons[question.answer].classList.add("is-correct");
+  markChoice(buttons[question.answer], "is-correct", "정답");
   if (!correct && choiceIndex !== null && choiceIndex !== undefined) {
-    buttons[choiceIndex].classList.add("is-wrong");
+    markChoice(buttons[choiceIndex], "is-wrong", "오답");
   }
+  renderStatusScore();
 
   var verdict = document.getElementById("feedback-verdict");
   if (correct) {
-    verdict.textContent = "정답입니다";
+    verdict.textContent = "정답";
   } else if (timedOut) {
-    verdict.textContent = "시간 초과입니다";
+    verdict.textContent = "시간 초과";
   } else {
-    verdict.textContent = "틀렸습니다";
+    verdict.textContent = "오답";
   }
   verdict.className = "verdict " + (correct ? "is-correct" : "is-wrong");
 
@@ -241,7 +246,16 @@ function renderFeedback(choiceIndex, correct, timedOut) {
   source.href = question.source.url;
 
   document.getElementById("feedback").classList.remove("hidden");
-  document.getElementById("btn-next").classList.remove("hidden");
+}
+
+/* 보기 버튼에 정답·오답 표시를 붙인다. 보기 글자는 그대로 두고 표시만 덧붙인다. */
+function markChoice(button, className, label) {
+  button.classList.add(className);
+
+  var mark = document.createElement("span");
+  mark.className = "mark";
+  mark.textContent = label;
+  button.appendChild(mark);
 }
 
 /* 점수, 문항별 정오 목록, 순위표 기록 여부 안내.
@@ -253,14 +267,28 @@ function renderResult() {
   var list = document.getElementById("result-list");
   list.textContent = "";
   for (var i = 0; i < round.results.length; i++) {
+    var question = round.questions[i];
+    var correct = round.results[i].correct;
+
     var item = document.createElement("li");
 
-    var mark = document.createElement("span");
-    mark.className = "mark " + (round.results[i].correct ? "is-correct" : "is-wrong");
-    mark.textContent = round.results[i].correct ? "맞힘" : "틀림";
+    var text = document.createElement("p");
+    text.textContent = question.text;
 
-    item.appendChild(mark);
-    item.appendChild(document.createTextNode(round.questions[i].text));
+    var detail = document.createElement("p");
+    detail.className = "detail";
+
+    var mark = document.createElement("span");
+    mark.className = "mark " + (correct ? "is-correct" : "is-wrong");
+    mark.textContent = correct ? "맞힘" : "틀림";
+    detail.appendChild(mark);
+
+    if (!correct) {
+      detail.appendChild(document.createTextNode(" 정답: " + question.choices[question.answer]));
+    }
+
+    item.appendChild(text);
+    item.appendChild(detail);
     list.appendChild(item);
   }
 

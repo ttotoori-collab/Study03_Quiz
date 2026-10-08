@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>상식 퀴즈</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f5bea'/%3E%3Ctext x='16' y='23' font-size='20' font-family='sans-serif' font-weight='bold' fill='%23ffffff' text-anchor='middle'%3E?%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,28 +14,33 @@
   <!-- 화면: 시작(카테고리 선택) -->
   <section id="screen-start" class="screen">
     <h1>상식 퀴즈</h1>
-    <p id="start-mode" class="mode-line"></p>
+    <p class="lead">카테고리를 고르세요. 한 판은 카테고리의 문항 전부입니다.</p>
+    <p id="start-mode" class="hidden"></p>
     <p id="start-note" class="note hidden"></p>
-    <h2>카테고리를 고르세요</h2>
     <div class="button-column">
-      <button type="button" class="choice" data-category-id="korean-history">한국사</button>
-      <button type="button" class="choice" data-category-id="world-geography">세계지리</button>
-      <button type="button" class="choice" data-category-id="science">과학</button>
-      <button type="button" class="choice" data-category-id="arts-culture">예술과 문화</button>
+      <button type="button" data-category-id="korean-history">한국사</button>
+      <button type="button" data-category-id="world-geography">세계지리</button>
+      <button type="button" data-category-id="science">과학</button>
+      <button type="button" data-category-id="arts-culture">예술과 문화</button>
     </div>
   </section>
 
   <!-- 화면: 퀴즈 -->
   <section id="screen-quiz" class="screen hidden">
-    <p id="quiz-progress" class="progress"></p>
+    <header class="status-bar">
+      <span id="status-label"></span>
+      <span id="quiz-progress"></span>
+      <span id="status-score"></span>
+      <span id="status-timer" class="timer hidden"></span>
+    </header>
     <h2 id="quiz-text" class="question"></h2>
     <div id="choice-list" class="button-column"></div>
     <div id="feedback" class="feedback hidden">
       <p id="feedback-verdict" class="verdict"></p>
-      <p id="feedback-explanation" class="explanation"></p>
-      <p class="source">출처: <a id="feedback-source" href="#" target="_blank" rel="noopener noreferrer"></a></p>
+      <p id="feedback-explanation"></p>
+      <p class="source">출처: <a id="feedback-source" target="_blank" rel="noopener noreferrer"></a></p>
+      <button id="btn-next" type="button" class="primary">다음</button>
     </div>
-    <button id="btn-next" type="button" class="primary hidden">다음</button>
   </section>
 
   <!-- 화면: 결과 -->
@@ -43,7 +49,7 @@
     <p id="result-score" class="score"></p>
     <p id="result-note" class="note hidden"></p>
     <ol id="result-list" class="result-list"></ol>
-    <div class="button-column">
+    <div class="button-row">
       <button id="btn-retry-category" type="button" class="primary">같은 카테고리 다시</button>
       <button id="btn-to-start" type="button">카테고리 선택으로</button>
     </div>
