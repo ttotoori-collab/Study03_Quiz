@@ -11,17 +11,40 @@
 
 <main class="app">
 
+  <!-- 화면: 모드 선택 -->
+  <section id="screen-mode" class="screen">
+    <h1>상식 퀴즈</h1>
+    <p class="lead">모드를 고르세요. 한 판은 10문제입니다.</p>
+    <div class="button-column">
+      <button type="button" class="mode-button" data-mode="practice">
+        <strong>연습</strong>
+        <span>시간 제한과 힌트 없음, 맞히면 1점</span>
+        <span class="mode-note">순위표에 기록되지 않음</span>
+      </button>
+      <button type="button" class="mode-button" data-mode="speed">
+        <strong>스피드</strong>
+        <span>문항마다 15초, 시간이 지나면 오답</span>
+      </button>
+      <button type="button" class="mode-button" data-mode="hint">
+        <strong>힌트</strong>
+        <span>문항마다 힌트 1번, 힌트를 쓰고 맞히면 0.5점</span>
+      </button>
+    </div>
+  </section>
+
   <!-- 화면: 시작(카테고리 선택) -->
-  <section id="screen-start" class="screen">
+  <section id="screen-start" class="screen hidden">
     <h1>상식 퀴즈</h1>
     <p class="lead">한 판은 10문제입니다.</p>
     <p id="start-note" class="note hidden"></p>
+    <h2>카테고리를 고르세요</h2>
     <div class="button-column">
       <button type="button" data-category-id="korean-history">한국사</button>
       <button type="button" data-category-id="world-geography">세계지리</button>
       <button type="button" data-category-id="science">과학</button>
       <button type="button" data-category-id="arts-culture">예술과 문화</button>
     </div>
+    <button id="btn-start-back" type="button">뒤로</button>
   </section>
 
   <!-- 화면: 퀴즈 -->
@@ -32,8 +55,10 @@
       <span id="status-score"></span>
       <span id="status-timer" class="timer hidden"></span>
     </header>
+    <div id="timer-bar" class="timer-bar hidden"><span id="timer-fill"></span></div>
     <h2 id="quiz-text" class="question"></h2>
     <div id="choice-list" class="button-column"></div>
+    <button id="btn-hint" type="button" class="hint-button hidden">힌트 (오답 2개 지우기)</button>
     <div id="feedback" class="feedback hidden">
       <p id="feedback-verdict" class="verdict"></p>
       <p id="feedback-explanation"></p>
@@ -46,9 +71,11 @@
   <section id="screen-result" class="screen hidden">
     <h2>결과</h2>
     <p id="result-score" class="score"></p>
+    <p id="result-remaining" class="remaining hidden"></p>
     <p id="result-note" class="note hidden"></p>
     <ol id="result-list" class="result-list"></ol>
     <div class="button-row">
+      <button id="btn-retry-wrong" type="button" class="primary hidden">틀린 문제 다시 풀기</button>
       <button id="btn-retry-category" type="button" class="primary">같은 모드 다시</button>
       <button id="btn-to-start" type="button">처음으로</button>
     </div>

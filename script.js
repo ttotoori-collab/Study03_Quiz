@@ -8,7 +8,9 @@
    ==================================================================== */
 
 var MODES = {
-  practice: { name: "연습", timeLimit: null, hint: false, hintScore: null, leaderboard: false, retryWrong: true }
+  practice: { name: "연습",   timeLimit: null, hint: false, hintScore: null, leaderboard: false, retryWrong: true  },
+  speed:    { name: "스피드", timeLimit: 15,   hint: false, hintScore: null, leaderboard: true,  retryWrong: false },
+  hint:     { name: "힌트",   timeLimit: null, hint: true,  hintScore: 0.5,  leaderboard: true,  retryWrong: false }
 };
 
 /* ====================================================================
@@ -114,6 +116,35 @@ function formatScore(n) {
   return String(n);
 }
 
+/* 문항 → 지울 보기 인덱스 2개. 정답은 절대 포함하지 않는다. */
+function pickHintChoices(question) {
+  var wrong = [];
+  for (var i = 0; i < question.choices.length; i++) {
+    if (i !== question.answer) {
+      wrong.push(i);
+    }
+  }
+  return shuffle(wrong).slice(0, 2);
+}
+
+/* 라운드 → 틀린 문항의 원본 배열 (복습 라운드의 입력). */
+function collectWrong(playedRound) {
+  var questions = getCategory(playedRound.categoryId).questions;
+  var wrong = [];
+
+  for (var i = 0; i < playedRound.results.length; i++) {
+    if (playedRound.results[i].correct) {
+      continue;
+    }
+    for (var q = 0; q < questions.length; q++) {
+      if (questions[q].id === playedRound.results[i].questionId) {
+        wrong.push(questions[q]);
+      }
+    }
+  }
+  return wrong;
+}
+
 /* 문항 데이터가 3장의 작성 규칙을 지키는지 검사한다.
    위반 내용을 문자열 배열로 돌려준다. 빈 배열이면 통과다. */
 function validateQuestions(data) {
@@ -197,11 +228,62 @@ function validateQuestions(data) {
 
 var round = null;
 var selectedMode = "practice";
+var timerId = null;
+var deadline = 0;
 
 function startRound(mode, categoryId) {
+  stopTimer();
   round = buildRound(mode, categoryId, getCategory(categoryId).questions);
   showScreen("screen-quiz");
   renderQuestion();
+}
+
+/* 틀린 문항만 모아 다시 푼다. 점수는 처음 판의 결과로 고정된다 (PRD §6). */
+function startReviewRound() {
+  var firstScore = round.isReview ? round.firstScore : totalScore(round);
+  var wrong = collectWrong(round);
+
+  stopTimer();
+  round = buildRound(round.mode, round.categoryId, wrong);
+  round.isReview = true;
+  round.firstScore = firstScore;
+
+  showScreen("screen-quiz");
+  renderQuestion();
+}
+
+/* 남은 시간은 틱을 세지 않고 Date.now() 기준으로 계산한다 (PRD §7). */
+function startTimer() {
+  stopTimer();
+
+  var limit = MODES[round.mode].timeLimit;
+  if (limit === null) {
+    renderTimerDisplay(null, 0);
+    return;
+  }
+
+  deadline = Date.now() + limit * 1000;
+  tickTimer();
+  timerId = setInterval(tickTimer, 100);
+}
+
+function tickTimer() {
+  var left = deadline - Date.now();
+  var limit = MODES[round.mode].timeLimit;
+
+  renderTimerDisplay(Math.max(0, Math.ceil(left / 1000)), Math.max(0, left) / (limit * 1000));
+
+  if (left <= 0) {
+    stopTimer();
+    commitAnswer(null, true);
+  }
+}
+
+function stopTimer() {
+  if (timerId !== null) {
+    clearInterval(timerId);
+    timerId = null;
+  }
 }
 
 /* 문항 하나를 확정한다. choiceIndex 는 숫자 또는 null(시간 초과).
@@ -211,6 +293,7 @@ function commitAnswer(choiceIndex, timedOut) {
     return;
   }
   round.answered = true;
+  stopTimer();
 
   var question = round.questions[round.index];
   var correct = !timedOut && choiceIndex === question.answer;
@@ -234,6 +317,7 @@ function goNext() {
     return;
   }
   if (round.index >= round.questions.length - 1) {
+    stopTimer();
     renderResult();
     return;
   }
@@ -300,6 +384,57 @@ function renderQuestion() {
 
   document.getElementById("feedback").classList.add("hidden");
   document.getElementById("btn-next").disabled = false;
+
+  var hintButton = document.getElementById("btn-hint");
+  if (MODES[round.mode].hint) {
+    hintButton.classList.remove("hidden");
+    hintButton.disabled = false;
+  } else {
+    hintButton.classList.add("hidden");
+  }
+
+  startTimer();
+}
+
+/* 남은 초 숫자와 줄어드는 가로 막대. left 가 null 이면 타이머를 숨긴다. */
+function renderTimerDisplay(left, ratio) {
+  var label = document.getElementById("status-timer");
+  var bar = document.getElementById("timer-bar");
+
+  if (left === null) {
+    label.classList.add("hidden");
+    bar.classList.add("hidden");
+    return;
+  }
+
+  label.textContent = left + "초";
+  label.classList.remove("hidden");
+  if (left <= 5) {
+    label.classList.add("urgent");
+  } else {
+    label.classList.remove("urgent");
+  }
+
+  bar.classList.remove("hidden");
+  document.getElementById("timer-fill").style.width = (ratio * 100) + "%";
+}
+
+/* 오답 보기 2개를 비활성 + 흐림 + 취소선으로 남긴다. DOM 에서 없애지 않는다. */
+function applyHint() {
+  if (round.answered || round.usedHint) {
+    return;
+  }
+
+  var picks = pickHintChoices(round.questions[round.index]);
+  var buttons = document.getElementById("choice-list").children;
+
+  for (var i = 0; i < picks.length; i++) {
+    buttons[picks[i]].disabled = true;
+    buttons[picks[i]].classList.add("removed");
+  }
+
+  round.usedHint = true;
+  document.getElementById("btn-hint").disabled = true;
 }
 
 function renderStatusScore() {
@@ -353,8 +488,33 @@ function markChoice(button, className, label) {
 /* 점수, 문항별 정오 목록, 순위표 기록 여부 안내.
    만점은 그 판의 문항 수에서 가져온다 (PRD §6). */
 function renderResult() {
+  stopTimer();
+
+  /* 복습 라운드는 처음 판의 점수를 그대로 유지하고 남은 오답만 갱신한다. */
+  var shownScore = round.isReview ? round.firstScore : totalScore(round);
+  var shownTotal = round.isReview
+    ? getCategory(round.categoryId).questions.length
+    : round.questions.length;
+
   document.getElementById("result-score").textContent =
-    formatScore(totalScore(round)) + " / " + round.questions.length;
+    formatScore(shownScore) + " / " + shownTotal;
+
+  var remaining = document.getElementById("result-remaining");
+  var wrongCount = collectWrong(round).length;
+  if (round.isReview) {
+    remaining.textContent = "남은 오답 " + wrongCount + "문항";
+    remaining.classList.remove("hidden");
+  } else {
+    remaining.textContent = "";
+    remaining.classList.add("hidden");
+  }
+
+  var retryWrong = document.getElementById("btn-retry-wrong");
+  if (MODES[round.mode].retryWrong && wrongCount > 0) {
+    retryWrong.classList.remove("hidden");
+  } else {
+    retryWrong.classList.add("hidden");
+  }
 
   var list = document.getElementById("result-list");
   list.textContent = "";
@@ -397,6 +557,24 @@ function renderResult() {
 }
 
 function bindEvents() {
+  document.getElementById("screen-mode").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-mode]");
+    if (!button) {
+      return;
+    }
+    selectedMode = button.dataset.mode;
+    renderStart();
+    showScreen("screen-start");
+  });
+
+  document.getElementById("btn-start-back").addEventListener("click", function () {
+    showScreen("screen-mode");
+  });
+
+  document.getElementById("btn-hint").addEventListener("click", applyHint);
+
+  document.getElementById("btn-retry-wrong").addEventListener("click", startReviewRound);
+
   document.getElementById("screen-start").addEventListener("click", function (event) {
     var button = event.target.closest("[data-category-id]");
     if (!button) {
@@ -423,7 +601,8 @@ function bindEvents() {
   });
 
   document.getElementById("btn-to-start").addEventListener("click", function () {
-    showScreen("screen-start");
+    stopTimer();
+    showScreen("screen-mode");
   });
 }
 
@@ -546,7 +725,7 @@ function selfTest() {
 
 bindEvents();
 renderStart();
-showScreen("screen-start");
+showScreen("screen-mode");
 
 if (location.search.indexOf("test") !== -1) {
   selfTest();
