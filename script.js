@@ -114,11 +114,89 @@ function formatScore(n) {
   return String(n);
 }
 
+/* 문항 데이터가 3장의 작성 규칙을 지키는지 검사한다.
+   위반 내용을 문자열 배열로 돌려준다. 빈 배열이면 통과다. */
+function validateQuestions(data) {
+  var problems = [];
+  var seenIds = {};
+  var total = 0;
+
+  if (!data || !data.categories) {
+    return ["QUIZ_DATA 에 categories 가 없다"];
+  }
+  if (data.categories.length !== 4) {
+    problems.push("카테고리가 4개가 아니다: " + data.categories.length + "개");
+  }
+
+  for (var c = 0; c < data.categories.length; c++) {
+    var category = data.categories[c];
+    var questions = category.questions || [];
+    total += questions.length;
+
+    if (questions.length !== 10) {
+      problems.push(category.id + " 의 문항이 10개가 아니다: " + questions.length + "개");
+    }
+
+    for (var q = 0; q < questions.length; q++) {
+      var question = questions[q];
+      var label = category.id + "/" + (question.id || "(id 없음)");
+
+      if (!question.id) {
+        problems.push(label + " 에 id 가 없다");
+      } else if (seenIds[question.id]) {
+        problems.push("id 가 중복된다: " + question.id);
+      } else {
+        seenIds[question.id] = true;
+      }
+
+      if (!question.text) {
+        problems.push(label + " 에 text 가 없다");
+      }
+      if (!question.explanation) {
+        problems.push(label + " 에 explanation 이 없다");
+      }
+
+      if (!question.choices || question.choices.length !== 4) {
+        problems.push(label + " 의 보기가 4개가 아니다");
+      } else {
+        for (var a = 0; a < question.choices.length; a++) {
+          for (var b = a + 1; b < question.choices.length; b++) {
+            if (question.choices[a] === question.choices[b]) {
+              problems.push(label + " 의 보기가 서로 같다: " + question.choices[a]);
+            }
+          }
+        }
+      }
+
+      if (typeof question.answer !== "number" || question.answer < 0 || question.answer > 3) {
+        problems.push(label + " 의 answer 가 0~3 이 아니다: " + question.answer);
+      }
+
+      if (!question.source || !question.source.name) {
+        problems.push(label + " 에 source.name 이 없다");
+      }
+      if (!question.source || !question.source.url || question.source.url.indexOf("http") !== 0) {
+        problems.push(label + " 의 source.url 이 http 로 시작하지 않는다");
+      }
+      if (!question.verifiedAt) {
+        problems.push(label + " 의 verifiedAt 이 비어 있다");
+      }
+    }
+  }
+
+  if (total !== 40) {
+    problems.push("전체 문항이 40개가 아니다: " + total + "개");
+  }
+
+  return problems;
+}
+
 /* ====================================================================
    3. 라운드 엔진
    ==================================================================== */
 
 var round = null;
+var selectedMode = "practice";
 
 function startRound(mode, categoryId) {
   round = buildRound(mode, categoryId, getCategory(categoryId).questions);
@@ -182,6 +260,20 @@ function showScreen(id) {
    5. DOM 렌더링과 이벤트 연결
    ==================================================================== */
 
+/* 시작 화면: 고른 모드와 순위표 기록 여부를 알린다. */
+function renderStart() {
+  var mode = MODES[selectedMode];
+  var note = document.getElementById("start-note");
+
+  if (mode.leaderboard) {
+    note.textContent = "";
+    note.classList.add("hidden");
+  } else {
+    note.textContent = mode.name + " 모드 · 순위표에 기록되지 않음";
+    note.classList.remove("hidden");
+  }
+}
+
 function renderQuestion() {
   var question = round.questions[round.index];
 
@@ -231,7 +323,7 @@ function renderFeedback(choiceIndex, correct, timedOut) {
 
   var verdict = document.getElementById("feedback-verdict");
   if (correct) {
-    verdict.textContent = "정답";
+    verdict.textContent = "정답!";
   } else if (timedOut) {
     verdict.textContent = "시간 초과";
   } else {
@@ -297,7 +389,7 @@ function renderResult() {
     note.textContent = "";
     note.classList.add("hidden");
   } else {
-    note.textContent = MODES[round.mode].name + " 모드는 순위표에 기록되지 않음";
+    note.textContent = "순위표에 기록되지 않음";
     note.classList.remove("hidden");
   }
 
@@ -310,7 +402,7 @@ function bindEvents() {
     if (!button) {
       return;
     }
-    startRound("practice", button.dataset.categoryId);
+    startRound(selectedMode, button.dataset.categoryId);
   });
 
   document.getElementById("choice-list").addEventListener("click", function (event) {
@@ -339,5 +431,123 @@ function bindEvents() {
    6. 초기화
    ==================================================================== */
 
+/* 주소 끝에 ?test 를 붙이면 콘솔에 자체 점검 결과를 찍는다.
+   순수 함수와 문항 데이터만 검사하므로 화면을 건드리지 않는다. */
+function selfTest() {
+  var passed = 0;
+  var failed = 0;
+
+  function check(name, run) {
+    var result;
+    try {
+      result = run();
+    } catch (error) {
+      result = error.message;
+    }
+    if (result === true) {
+      passed += 1;
+      console.log("통과: " + name);
+    } else {
+      failed += 1;
+      console.error("실패: " + name + " — " + result);
+    }
+  }
+
+  var numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  var sorted = function (list) { return list.slice().sort(function (a, b) { return a - b; }).join(","); };
+  var sample = QUIZ_DATA.categories[0].questions[0];
+  var category = QUIZ_DATA.categories[0];
+
+  check("shuffle 은 원본 배열을 바꾸지 않는다", function () {
+    var before = numbers.join(",");
+    shuffle(numbers);
+    return numbers.join(",") === before || "원본 배열이 바뀌었다";
+  });
+
+  check("shuffle 은 원소를 모두 보존한다", function () {
+    return sorted(shuffle(numbers)) === sorted(numbers) || "원소가 달라졌다";
+  });
+
+  check("shuffle 은 순서를 실제로 섞는다", function () {
+    var seen = {};
+    var kinds = 0;
+    for (var i = 0; i < 30; i++) {
+      var key = shuffle(numbers).join(",");
+      if (!seen[key]) {
+        seen[key] = true;
+        kinds += 1;
+      }
+    }
+    return kinds > 1 || "30번 돌려도 순서가 하나뿐이다";
+  });
+
+  check("shuffleChoices 는 정답 문자열을 유지한다", function () {
+    var expected = sample.choices[sample.answer];
+    for (var i = 0; i < 20; i++) {
+      var copy = shuffleChoices(sample);
+      if (copy.choices[copy.answer] !== expected) {
+        return "정답이 " + copy.choices[copy.answer] + " 로 바뀌었다";
+      }
+    }
+    return true;
+  });
+
+  check("shuffleChoices 는 원본 문항을 바꾸지 않는다", function () {
+    var beforeChoices = sample.choices.join(",");
+    var beforeAnswer = sample.answer;
+    shuffleChoices(sample);
+    return (sample.choices.join(",") === beforeChoices && sample.answer === beforeAnswer)
+      || "원본 문항이 바뀌었다";
+  });
+
+  check("buildRound 는 카테고리의 문항을 모두 담는다", function () {
+    var built = buildRound("practice", category.id, category.questions);
+    return built.questions.length === category.questions.length
+      || "문항 수가 " + built.questions.length + " 개다";
+  });
+
+  check("buildRound 의 초기 상태가 비어 있다", function () {
+    var built = buildRound("practice", category.id, category.questions);
+    return (built.index === 0 && built.results.length === 0 && built.answered === false
+      && built.usedHint === false && built.isReview === false && built.firstScore === null)
+      || "초기 상태가 다르다";
+  });
+
+  check("buildRound 사본을 고쳐도 QUIZ_DATA 가 오염되지 않는다", function () {
+    var built = buildRound("practice", category.id, category.questions);
+    var before = category.questions[0].choices.join(",");
+    built.questions[0].choices[0] = "오염";
+    built.questions[0].answer = 99;
+    return category.questions[0].choices.join(",") === before || "원본 보기가 바뀌었다";
+  });
+
+  check("scoreAnswer 는 연습 모드에서 맞히면 1점을 준다", function () {
+    var score = scoreAnswer("practice", { correct: true, usedHint: false, timedOut: false });
+    return score === 1 || "점수가 " + score + " 다";
+  });
+
+  check("scoreAnswer 는 틀리면 0점을 준다", function () {
+    var score = scoreAnswer("practice", { correct: false, usedHint: false, timedOut: false });
+    return score === 0 || "점수가 " + score + " 다";
+  });
+
+  check("scoreAnswer 는 시간 초과를 0점으로 매긴다", function () {
+    var score = scoreAnswer("practice", { correct: true, usedHint: false, timedOut: true });
+    return score === 0 || "점수가 " + score + " 다";
+  });
+
+  check("validateQuestions 로 문항 40개가 작성 규칙을 지킨다", function () {
+    var problems = validateQuestions(QUIZ_DATA);
+    return problems.length === 0 || problems.join(" / ");
+  });
+
+  console.log("자체 점검 결과: 통과 " + passed + ", 실패 " + failed);
+}
+
 bindEvents();
+renderStart();
 showScreen("screen-start");
+
+if (location.search.indexOf("test") !== -1) {
+  selfTest();
+}
