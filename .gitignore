@@ -1,0 +1,5 @@
+# Claude Code 세션 설정
+.claude/
+
+# 구현 계획 작업 기록(로컬 전용)
+.superpowers/
