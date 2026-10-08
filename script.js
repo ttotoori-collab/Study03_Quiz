@@ -594,6 +594,18 @@ function renderResult() {
     remaining.classList.add("hidden");
   }
 
+  /* 순위표에 기록하는 모드의 첫 판에서만 이름 입력과 저장을 보인다. */
+  var saveForm = document.getElementById("save-form");
+  if (MODES[round.mode].leaderboard && !round.isReview) {
+    document.getElementById("save-name").value = "";
+    document.getElementById("btn-save").disabled = false;
+    document.getElementById("save-result").textContent = "";
+    document.getElementById("save-result").classList.add("hidden");
+    saveForm.classList.remove("hidden");
+  } else {
+    saveForm.classList.add("hidden");
+  }
+
   var retryWrong = document.getElementById("btn-retry-wrong");
   if (MODES[round.mode].retryWrong && wrongCount > 0) {
     retryWrong.classList.remove("hidden");
@@ -659,6 +671,30 @@ function bindEvents() {
   document.getElementById("btn-hint").addEventListener("click", applyHint);
 
   document.getElementById("btn-retry-wrong").addEventListener("click", startReviewRound);
+
+  /* 저장은 한 판에 한 번만 된다 (PRD §6). */
+  document.getElementById("save-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    var button = document.getElementById("btn-save");
+    if (button.disabled) {
+      return;
+    }
+    button.disabled = true;
+
+    var name = normalizeName(document.getElementById("save-name").value);
+    var saved = saveScore(scoreKey(round.mode, round.categoryId), {
+      name: name,
+      score: totalScore(round),
+      at: nowKst()
+    });
+
+    var message = document.getElementById("save-result");
+    message.textContent = saved
+      ? name + " 으로 저장했습니다"
+      : "이 브라우저에서는 기록을 저장할 수 없습니다";
+    message.classList.remove("hidden");
+  });
 
   document.getElementById("screen-start").addEventListener("click", function (event) {
     var button = event.target.closest("[data-category-id]");

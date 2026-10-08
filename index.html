@@ -73,6 +73,14 @@
     <p id="result-score" class="score"></p>
     <p id="result-remaining" class="remaining hidden"></p>
     <p id="result-note" class="note hidden"></p>
+    <form id="save-form" class="save-form hidden">
+      <label for="save-name">이름 (12자까지)</label>
+      <div class="save-row">
+        <input id="save-name" type="text" maxlength="12" autocomplete="nickname">
+        <button id="btn-save" type="submit" class="primary">순위표에 저장</button>
+      </div>
+      <p id="save-result" class="note hidden"></p>
+    </form>
     <ol id="result-list" class="result-list"></ol>
     <div class="button-row">
       <button id="btn-retry-wrong" type="button" class="primary hidden">틀린 문제 다시 풀기</button>
