@@ -96,25 +96,25 @@ PRD가 요구하지만 어느 작업의 기능 확인에도 자연히 걸리지 
 - 제공: `MODES.practice` = `{ name: "연습", timeLimit: null, hint: false, hintScore: null, leaderboard: false, retryWrong: true }`
 - 제공: `getCategory(categoryId)` → `QUIZ_DATA.categories`에서 `id`가 일치하는 객체
 
-- [ ] **1단계: `questions.js`에 `QUIZ_DATA` 작성**
+- [x] **1단계: `questions.js`에 `QUIZ_DATA` 작성**
 
 PRD §3의 스키마와 샘플 8문항을 그대로 옮긴다. `version: 1`, 카테고리 4개는 `korean-history`/`world-geography`/`science`/`arts-culture`, 각 2문항, `verifiedAt`은 모두 `null`.
 
-- [ ] **2단계: `index.html` 작성**
+- [x] **2단계: `index.html` 작성**
 
 `<section id="screen-start">`, `#screen-quiz`, `#screen-result` 세 개와 `questions.js` → `script.js` 순서의 `<script>` 태그. 시작 화면에는 카테고리 버튼 4개를 `data-category-id` 속성과 함께 둔다.
 
-- [ ] **3단계: `script.js`에 6구역 주석과 `showScreen(id)` 구현**
+- [x] **3단계: `script.js`에 6구역 주석과 `showScreen(id)` 구현**
 
 `showScreen`은 화면 섹션 전체에 `.hidden`을 붙이고 `id`인 것만 떼는 방식. 구역 주석 6개를 먼저 써 두고 이후 작업이 해당 구역에만 코드를 넣는다.
 
-- [ ] **4단계: `style.css`에 `.hidden { display: none; }`과 기본 레이아웃**
+- [x] **4단계: `style.css`에 `.hidden { display: none; }`과 기본 레이아웃**
 
-- [ ] **5단계: 브라우저 확인**
+- [x] **5단계: 브라우저 확인**
 
 `index.html` 더블클릭 → 시작 화면만 보인다. 콘솔에 오류 없음. 콘솔에서 `showScreen("screen-quiz")`를 실행하면 퀴즈 화면으로 바뀐다.
 
-- [ ] **6단계: 커밋** — `chore: 파일 4개 골격과 화면 전환`
+- [x] **6단계: 커밋** — `chore: 파일 4개 골격과 화면 전환`
 
 ### 작업 1.2: 순수 함수 구역
 
@@ -131,17 +131,17 @@ PRD §3의 스키마와 샘플 8문항을 그대로 옮긴다. `version: 1`, 카
   - `totalScore(round)` → `round.results`의 `score` 합계
   - `formatScore(n)` → 문자열. `7.5` → `"7.5"`, `8` → `"8"`
 
-- [ ] **1단계: `shuffle`, `shuffleChoices`, `buildRound` 구현**
+- [x] **1단계: `shuffle`, `shuffleChoices`, `buildRound` 구현**
 
 `shuffleChoices`는 보기 인덱스 배열을 섞고 새 `choices`를 만든 뒤, 원래 `answer` 위치가 옮겨 간 자리를 새 `answer`로 삼는다. 원본 문항 객체를 수정하지 않는다.
 
-- [ ] **2단계: `scoreAnswer(mode, outcome)` 구현 — PRD §6 채점표 그대로**
+- [x] **2단계: `scoreAnswer(mode, outcome)` 구현 — PRD §6 채점표 그대로**
 
 `timedOut`이 참이면 0점(오답 처리). `correct`가 거짓이면 0점(힌트를 썼든 안 썼든 감점 없음). 맞혔고 `usedHint`가 참이며 `MODES[mode].hintScore`가 `null`이 아니면 `hintScore`. 그 밖에 맞히면 1점. **모드 이름을 보지 않고 `MODES[mode]`의 값만 읽는다.**
 
-- [ ] **3단계: `totalScore`, `formatScore` 구현**
+- [x] **3단계: `totalScore`, `formatScore` 구현**
 
-- [ ] **4단계: 브라우저 콘솔 확인**
+- [x] **4단계: 브라우저 콘솔 확인**
 
 `file://`로 열어 둔 페이지의 콘솔에서:
 
@@ -156,7 +156,7 @@ s.choices[s.answer] === q.choices[q.answer]  // true
 q.choices[q.answer]  // 원본 정답 문자열 그대로
 ```
 
-- [ ] **5단계: 커밋** — `feat: 섞기와 채점 순수 함수`
+- [x] **5단계: 커밋** — `feat: 섞기와 채점 순수 함수`
 
 ### 작업 1.3: 퀴즈 진행 엔진과 문항 렌더링
 
@@ -171,32 +171,32 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
   - `commitAnswer(choiceIndex, timedOut)` — 문항 하나를 확정한다. `choiceIndex`는 숫자 또는 `null`(시간 초과). `round.answered`가 참이면 **즉시 반환**
   - `goNext()` — 다음 문항 또는 결과 화면
 
-- [ ] **1단계: `index.html` 퀴즈 화면 내부 요소 추가**
+- [x] **1단계: `index.html` 퀴즈 화면 내부 요소 추가**
 
 진행 표시, 문항 본문, 보기 버튼 4개를 담을 컨테이너, 피드백 영역(정답 여부 / 한 줄 해설 / 출처 행), [다음] 버튼.
 
-- [ ] **2단계: `renderQuestion()` 구현**
+- [x] **2단계: `renderQuestion()` 구현**
 
 문항 본문과 보기 4개를 그리고 피드백 영역과 [다음]을 숨긴다. `round.answered = false`, `round.usedHint = false`로 되돌린다. 보기 텍스트는 `textContent`로 넣는다.
 
-- [ ] **3단계: `commitAnswer(choiceIndex, timedOut)` 구현**
+- [x] **3단계: `commitAnswer(choiceIndex, timedOut)` 구현**
 
 맨 앞에서 `round.answered` 가드 → 참이면 반환. 거짓이면 즉시 `true`로 바꾼다. 보기 버튼 4개를 모두 비활성한다. `scoreAnswer`를 불러 `round.results`에 `{ questionId, correct, usedHint, timedOut, score }`를 push 한다. 정답 보기와 (틀렸을 때) 고른 보기를 색으로 구분하고, 한 줄 해설과 `source.name` 출처 행(`source.url`로 가는 새 탭 링크)을 띄우고 [다음]을 보인다. 시간 초과(`timedOut`)도 **같은 화면**을 띄운다.
 
-- [ ] **4단계: `goNext()` 구현과 [다음] 연타 가드**
+- [x] **4단계: `goNext()` 구현과 [다음] 연타 가드**
 
 [다음]을 누르면 즉시 버튼을 비활성한다. `round.index`가 마지막이면 `renderResult()`, 아니면 `index`를 올리고 `renderQuestion()`.
 
-- [ ] **5단계: 시작 화면 카테고리 버튼에 `startRound("practice", id)` 연결**
+- [x] **5단계: 시작 화면 카테고리 버튼에 `startRound("practice", id)` 연결**
 
-- [ ] **6단계: 브라우저 확인**
+- [x] **6단계: 브라우저 확인**
 
 - 카테고리를 골라 문항을 풀고 해설·출처가 나오는지
 - 보기를 고른 뒤 다른 보기를 눌러도 반응 없는지
 - [다음]을 빠르게 두 번 눌러 문항이 두 개 넘어가지 않는지
 - **검토 초점 5.** 콘솔에서 `QUIZ_DATA.categories[2].questions.pop()` 후 과학을 시작 → 진행 표시가 `1 / 1`로 나오고 끝까지 진행되는지 (확인 후 새로고침)
 
-- [ ] **7단계: 커밋** — `feat: 퀴즈 진행 엔진과 즉시 채점`
+- [x] **7단계: 커밋** — `feat: 퀴즈 진행 엔진과 즉시 채점`
 
 ### 작업 1.4: 결과 화면
 
@@ -207,17 +207,17 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 - 소비: `totalScore`, `formatScore`, `round`
 - 제공: `renderResult()` — 점수는 `formatScore(totalScore(round)) + " / " + round.questions.length`. 버튼 [같은 카테고리 다시] / [카테고리 선택으로]
 
-- [ ] **1단계: `index.html` 결과 화면 내부 추가** — 점수 표시, 문항별 정오 목록 컨테이너, 안내 문구 자리, 버튼 2개
+- [x] **1단계: `index.html` 결과 화면 내부 추가** — 점수 표시, 문항별 정오 목록 컨테이너, 안내 문구 자리, 버튼 2개
 
-- [ ] **2단계: `renderResult()` 구현**
+- [x] **2단계: `renderResult()` 구현**
 
 점수, 문항별 정오 목록(문항 본문 + 맞힘/틀림), 그리고 `MODES[round.mode].leaderboard`가 거짓이면 **"순위표에 기록되지 않음"**을 표시한다. 모드 이름으로 분기하지 않는다.
 
-- [ ] **3단계: 버튼 연결** — [같은 카테고리 다시]는 `startRound(round.mode, round.categoryId)`, [카테고리 선택으로]는 `showScreen("screen-start")`
+- [x] **3단계: 버튼 연결** — [같은 카테고리 다시]는 `startRound(round.mode, round.categoryId)`, [카테고리 선택으로]는 `showScreen("screen-start")`
 
-- [ ] **4단계: 브라우저 확인** — 위 "1단계 브라우저에서 직접 확인할 항목" 전부를 한 번 밟는다
+- [x] **4단계: 브라우저 확인** — 위 "1단계 브라우저에서 직접 확인할 항목" 전부를 한 번 밟는다
 
-- [ ] **5단계: 커밋** — `feat: 결과 화면과 점수 표시`
+- [x] **5단계: 커밋** — `feat: 결과 화면과 점수 표시`
 
 ### 작업 1.5: 참고 디자인에 맞춘 화면 스타일
 
@@ -231,12 +231,12 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 - 제공: `markChoice(button, className, label)` — 보기 버튼에 `정답`/`오답` 표시를 덧붙인다
 - 변경: `#btn-next` 가 `#feedback` 안으로 들어간다. 더 이상 자기 `hidden` 을 따로 토글하지 않고 피드백 카드가 보이면 함께 보인다
 
-- [ ] **1단계: `style.css` 를 디자인 토큰 기준으로 다시 쓴다** — 화면을 카드로 감싸지 않고 배경 위에 두고, 버튼·피드백·순위표만 흰 표면으로 둔다
-- [ ] **2단계: `index.html` 에 상태바 추가** — `#status-label`(카테고리 · 모드), `#quiz-progress`, `#status-score`, `#status-timer`(2단계에서 사용, 기본 숨김)
-- [ ] **3단계: `renderQuestion` 에서 상태바를 채우고, `renderFeedback` 에서 보기에 정답·오답 표시를 붙인다** — 판정 문구는 `정답` / `오답` / `시간 초과`
-- [ ] **4단계: 결과 목록을 문항 본문 + 상세 줄(맞힘·틀림, 틀렸으면 정답)로 바꾼다**
-- [ ] **5단계: 브라우저 확인** — 1단계 확인 항목 전부가 그대로 동작하고, 참고 페이지와 화면이 같은 디자인으로 보이는지
-- [ ] **6단계: 커밋** — `style: 참고 디자인에 맞춘 화면 스타일`
+- [x] **1단계: `style.css` 를 디자인 토큰 기준으로 다시 쓴다** — 화면을 카드로 감싸지 않고 배경 위에 두고, 버튼·피드백·순위표만 흰 표면으로 둔다
+- [x] **2단계: `index.html` 에 상태바 추가** — `#status-label`(카테고리 · 모드), `#quiz-progress`, `#status-score`, `#status-timer`(2단계에서 사용, 기본 숨김)
+- [x] **3단계: `renderQuestion` 에서 상태바를 채우고, `renderFeedback` 에서 보기에 정답·오답 표시를 붙인다** — 판정 문구는 `정답` / `오답` / `시간 초과`
+- [x] **4단계: 결과 목록을 문항 본문 + 상세 줄(맞힘·틀림, 틀렸으면 정답)로 바꾼다**
+- [x] **5단계: 브라우저 확인** — 1단계 확인 항목 전부가 그대로 동작하고, 참고 페이지와 화면이 같은 디자인으로 보이는지
+- [x] **6단계: 커밋** — `style: 참고 디자인에 맞춘 화면 스타일`
 
 > **게이트: 여기서 멈추고 승인을 받는다.**
 
@@ -263,11 +263,11 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 6. `text`에 최상급 표현이 있으면 같은 문항에 4자리 연도나 "기준"이 함께 있음
 7. 검사 스크립트가 위반 0건을 보고하고, 스크립트 파일이 프로젝트에 남지 않음
 
-- [ ] **1단계: 카테고리별 10문항 집필** — 사실을 확인한 구체 페이지 주소와 확인 날짜를 문항마다 채운다
-- [ ] **2단계: 검사 스크립트를 스크래치패드에 작성해 실행** — 위 완료 기준 1~6을 검사하고 위반 문항의 `id`와 위반 항목을 출력
-- [ ] **3단계: 위반 수정 후 재실행** — 위반 0건 확인
-- [ ] **4단계: 스크립트 삭제** — 프로젝트 디렉터리에 파일 4개만 남은 것을 확인
-- [ ] **5단계: 커밋** — `feat: 문항 40개 집필과 출처 확인`
+- [x] **1단계: 카테고리별 10문항 집필** — 사실을 확인한 구체 페이지 주소와 확인 날짜를 문항마다 채운다
+- [x] **2단계: 검사 스크립트를 스크래치패드에 작성해 실행** — 위 완료 기준 1~6을 검사하고 위반 문항의 `id`와 위반 항목을 출력
+- [x] **3단계: 위반 수정 후 재실행** — 위반 0건 확인
+- [x] **4단계: 스크립트 삭제** — 프로젝트 디렉터리에 파일 4개만 남은 것을 확인
+- [x] **5단계: 커밋** — `feat: 문항 40개 집필과 출처 확인`
 
 **브라우저에서 직접 확인할 항목** (사람이 하는 최종 검수 — PRD §7)
 
@@ -314,7 +314,7 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 - [ ] 해설이 떠 있는 동안 남은 초가 멈춰 있는지
 - [ ] [다음]을 누르면 15초부터 다시 세는지
 - [ ] 문항 5개를 연속으로 진행한 뒤 남은 초가 **한 칸씩** 떨어지는지 (겹친 타이머)
-- [ ] **다른 창을 띄워 10초쯤 가린 뒤 돌아왔을 때** 남은 초가 늘어나 있지 않고, 음수가 찍히지 않는지 (검토 초점 1.)
+- [x] **다른 창을 띄워 10초쯤 가린 뒤 돌아왔을 때** 남은 초가 늘어나 있지 않고, 음수가 찍히지 않는지 (검토 초점 1.)
 - [ ] 남은 초가 1초쯤일 때 보기를 눌러 본다 → 점수가 한 번만 반영되고 결과 목록에 중복 항목이 없는지 (검토 초점 2.)
 - [ ] 퀴즈 도중 [모드 선택으로] 빠져나간 뒤 1분쯤 기다렸다 새 판을 시작 → 남은 초가 정상인지 (타이머 정리)
 
@@ -335,7 +335,7 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 
 모드 선택
 - [ ] 모드 선택 → 시작 화면에 고른 모드 이름이 보이는지
-- [ ] **연습 모드를 고르면 시작 화면 상단에 "순위표에 기록되지 않음"이 보이는지**
+- [x] **연습 모드를 고르면 시작 화면 상단에 "순위표에 기록되지 않음"이 보이는지**
 
 ### 작업 2.1: `MODES` 확장과 모드 선택 화면
 
@@ -347,13 +347,13 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
 - 제공: `MODES.hint` = `{ name: "힌트", timeLimit: null, hint: true, hintScore: 0.5, leaderboard: true, retryWrong: false }`
 - 제공: `selectedMode` (전역, 기본 `null`) — 시작 화면에 들어설 때 정해져 있다. `renderStart()`가 이 값을 읽는다
 
-- [ ] **1단계: `MODES`에 두 줄 추가** — 위 값 그대로
-- [ ] **2단계: `#screen-mode` 추가** — 연습/스피드/힌트 버튼 3개에 각각 한 줄 설명(제한 시간·힌트·배점)과 [순위표] 버튼 자리. 초기화에서 첫 화면을 `screen-mode`로 바꾼다
-- [ ] **3단계: `renderStart()` 구현** — 고른 모드 이름 표시, `MODES[selectedMode].leaderboard`가 거짓이면 "순위표에 기록되지 않음"을 상단에 표시
-- [ ] **4단계: 시작 화면 카테고리 버튼 핸들러를 `startRound(selectedMode, id)`로 바꾼다** — 작업 1.3에서 `"practice"`로 박아 둔 자리다
-- [ ] **5단계: 결과 화면에 [모드 선택으로] 버튼 추가** — 누를 때 타이머를 정리한다
-- [ ] **6단계: 브라우저 확인** — 모드 3개를 각각 골라 시작 화면의 모드 이름과 연습 모드 안내 문구 확인, 그리고 고른 모드로 판이 시작되는지
-- [ ] **7단계: 커밋** — `feat: 모드 서술자 확장과 모드 선택 화면`
+- [x] **1단계: `MODES`에 두 줄 추가** — 위 값 그대로
+- [x] **2단계: `#screen-mode` 추가** — 연습/스피드/힌트 버튼 3개에 각각 한 줄 설명(제한 시간·힌트·배점)과 [순위표] 버튼 자리. 초기화에서 첫 화면을 `screen-mode`로 바꾼다
+- [x] **3단계: `renderStart()` 구현** — 고른 모드 이름 표시, `MODES[selectedMode].leaderboard`가 거짓이면 "순위표에 기록되지 않음"을 상단에 표시
+- [x] **4단계: 시작 화면 카테고리 버튼 핸들러를 `startRound(selectedMode, id)`로 바꾼다** — 작업 1.3에서 `"practice"`로 박아 둔 자리다
+- [x] **5단계: 결과 화면에 [모드 선택으로] 버튼 추가** — 누를 때 타이머를 정리한다
+- [x] **6단계: 브라우저 확인** — 모드 3개를 각각 골라 시작 화면의 모드 이름과 연습 모드 안내 문구 확인, 그리고 고른 모드로 판이 시작되는지
+- [x] **7단계: 커밋** — `feat: 모드 서술자 확장과 모드 선택 화면`
 
 ### 작업 2.2: 스피드 모드 타이머
 
@@ -367,20 +367,20 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
   - `stopTimer()` — `clearInterval`하고 `timerId = null`. **여러 번 불러도 안전해야 한다**
   - 전역 `timerId`, `deadline`
 
-- [ ] **1단계: `index.html`·`style.css`에 남은 초 숫자와 가로 막대 추가** — `timeLimit`이 없는 모드에서는 숨긴다
-- [ ] **2단계: `startTimer()` / `stopTimer()` 구현**
+- [x] **1단계: `index.html`·`style.css`에 남은 초 숫자와 가로 막대 추가** — `timeLimit`이 없는 모드에서는 숨긴다
+- [x] **2단계: `startTimer()` / `stopTimer()` 구현**
 
 남은 시간은 **틱을 세지 않고** `deadline - Date.now()`로 계산한다(숨은 탭에서 `setInterval`이 느려져도 늘어나지 않게). 화면에는 음수가 아닌 값만 표시한다. 0 이하가 되면 `stopTimer()` 후 `commitAnswer(null, true)`.
 
-- [ ] **3단계: 타이머 정리 지점 4곳 연결**
+- [x] **3단계: 타이머 정리 지점 4곳 연결**
 
 `startTimer()`는 호출 맨 앞에서 `stopTimer()`를 먼저 부른다. 그리고 ①`commitAnswer` 안(문항 확정), ②결과 화면으로 갈 때, ③[모드 선택으로]/[카테고리 선택으로] 빠져나갈 때, ④새 판 시작 시 각각 `stopTimer()`를 부른다.
 
-- [ ] **4단계: `renderQuestion()` 끝에서 `startTimer()` 호출**
+- [x] **4단계: `renderQuestion()` 끝에서 `startTimer()` 호출**
 
-- [ ] **5단계: 브라우저 확인** — 위 "타이머" 확인 항목 7개 전부. 특히 숨은 탭 복귀(검토 초점 1.)와 1초 남기고 클릭(검토 초점 2.)
+- [x] **5단계: 브라우저 확인** — 위 "타이머" 확인 항목 7개 전부. 특히 숨은 탭 복귀(검토 초점 1.)와 1초 남기고 클릭(검토 초점 2.)
 
-- [ ] **6단계: 커밋** — `feat: 스피드 모드 타이머`
+- [x] **6단계: 커밋** — `feat: 스피드 모드 타이머`
 
 ### 작업 2.3: 힌트 모드
 
@@ -393,18 +393,18 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
   - `pickHintChoices(question)` → 지울 보기 인덱스 **2개** 배열. `question.answer`를 **절대 포함하지 않는다**
   - `applyHint()` — `pickHintChoices`가 돌려준 보기 2개를 비활성화하고 `.eliminated` 클래스를 붙이고, `round.usedHint = true`, [힌트] 버튼을 비활성한다
 
-- [ ] **1단계: `pickHintChoices(question)` 구현** — 오답 인덱스 3개를 모아 `shuffle`로 섞고 앞 2개를 돌려준다
-- [ ] **2단계: `.eliminated` 스타일** — 흐림 + 취소선. DOM에서 없애지 않는다(레이아웃이 튀지 않게)
-- [ ] **3단계: [힌트] 버튼과 `applyHint()` 연결** — 버튼은 `MODES[round.mode].hint`가 참일 때만 보인다
-- [ ] **4단계: 지워진 보기 클릭 차단 확인** — `commitAnswer`가 비활성 보기에서는 호출되지 않는 것을 확인
-- [ ] **5단계: `commitAnswer`에 `round.usedHint` 전달 확인** — `scoreAnswer`가 0.5점을 돌려주는지 (작업 1.2에서 이미 구현됨, 배선만 확인)
-- [ ] **6단계: 브라우저 확인**
+- [x] **1단계: `pickHintChoices(question)` 구현** — 오답 인덱스 3개를 모아 `shuffle`로 섞고 앞 2개를 돌려준다
+- [x] **2단계: `.eliminated` 스타일** — 흐림 + 취소선. DOM에서 없애지 않는다(레이아웃이 튀지 않게)
+- [x] **3단계: [힌트] 버튼과 `applyHint()` 연결** — 버튼은 `MODES[round.mode].hint`가 참일 때만 보인다
+- [x] **4단계: 지워진 보기 클릭 차단 확인** — `commitAnswer`가 비활성 보기에서는 호출되지 않는 것을 확인
+- [x] **5단계: `commitAnswer`에 `round.usedHint` 전달 확인** — `scoreAnswer`가 0.5점을 돌려주는지 (작업 1.2에서 이미 구현됨, 배선만 확인)
+- [x] **6단계: 브라우저 확인**
 
 - 힌트 모드로 한 판을 풀며 **문항마다** [힌트]를 눌러 지워진 2개가 모두 오답인지 확인
 - 힌트 쓰고 맞힘 → 0.5점, 힌트 쓰고 틀림 → 0점이고 감점 없음
 - [힌트] 두 번 클릭, 지워진 보기 클릭
 
-- [ ] **7단계: 커밋** — `feat: 힌트 모드`
+- [x] **7단계: 커밋** — `feat: 힌트 모드`
 
 ### 작업 2.4: 틀린 문제 다시 풀기
 
@@ -417,15 +417,15 @@ q.choices[q.answer]  // 원본 정답 문자열 그대로
   - `collectWrong(round)` → `round.results`에서 `correct`가 거짓인 항목의 **원본 문항** 배열 (`QUIZ_DATA`에서 `questionId`로 찾는다)
   - `startReviewRound()` — `collectWrong(round)`로 새 라운드를 만든다. `isReview: true`, `firstScore`는 **처음 판의 점수**(현재 라운드가 이미 복습이면 그 값을 그대로 물려받는다). `timeLimit`과 `hint`가 없는 연습 방식으로 푼다
 
-- [ ] **1단계: `collectWrong(round)` 구현**
-- [ ] **2단계: `startReviewRound()` 구현** — 문항 순서와 보기 순서를 **다시 섞는다**(`buildRound`가 이미 한다). `firstScore = round.isReview ? round.firstScore : totalScore(round)`
-- [ ] **3단계: `renderResult()`에 복습 분기 추가**
+- [x] **1단계: `collectWrong(round)` 구현**
+- [x] **2단계: `startReviewRound()` 구현** — 문항 순서와 보기 순서를 **다시 섞는다**(`buildRound`가 이미 한다). `firstScore = round.isReview ? round.firstScore : totalScore(round)`
+- [x] **3단계: `renderResult()`에 복습 분기 추가**
 
 `MODES[round.mode].retryWrong`이 참이고 `collectWrong(round).length > 0`이면 [틀린 문제 다시 풀기]를 **맨 위에** 보인다. `round.isReview`가 참이면 점수 표시에 `firstScore`를 쓰고(복습으로 점수가 오르지 않는다) `남은 오답 N문항`을 함께 보인다.
 
-- [ ] **4단계: 복습 라운드에서 타이머·힌트가 뜨지 않는 것 확인** — 복습은 연습 모드 라운드이므로 `MODES.practice`의 스위치가 그대로 적용된다
-- [ ] **5단계: 브라우저 확인** — 위 "다시 풀기" 확인 항목 7개 전부
-- [ ] **6단계: 커밋** — `feat: 틀린 문제 다시 풀기`
+- [x] **4단계: 복습 라운드에서 타이머·힌트가 뜨지 않는 것 확인** — 복습은 연습 모드 라운드이므로 `MODES.practice`의 스위치가 그대로 적용된다
+- [x] **5단계: 브라우저 확인** — 위 "다시 풀기" 확인 항목 7개 전부
+- [x] **6단계: 커밋** — `feat: 틀린 문제 다시 풀기`
 
 > **게이트: 여기서 멈추고 승인을 받는다.**
 
