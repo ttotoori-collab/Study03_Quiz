@@ -22,7 +22,7 @@ var QUIZ_DATA = {
         },
         {
           id: "kh-02",
-          text: "유네스코 세계기록유산 등재 기준으로, 현존하는 금속활자 인쇄본 가운데 가장 오래된 책은?",
+          text: "2001년 유네스코 세계기록유산 등재 기준으로, 현존하는 금속활자 인쇄본 가운데 가장 오래된 책은?",
           choices: ["직지심체요절", "팔만대장경", "무구정광대다라니경", "삼국사기"],
           answer: 0,
           explanation: "1377년 청주 흥덕사에서 인쇄됐다. 무구정광대다라니경은 목판본이다.",
@@ -109,7 +109,7 @@ var QUIZ_DATA = {
       questions: [
         {
           id: "wg-01",
-          text: "브리태니커 백과사전 기재 기준으로, 세계에서 가장 긴 강은?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 세계에서 가장 긴 강은?",
           choices: ["나일강", "아마존강", "양쯔강", "미시시피강"],
           answer: 0,
           explanation: "측정 방식에 따라 아마존강을 더 길게 보는 자료도 있어 답이 갈린다.",
@@ -127,10 +127,10 @@ var QUIZ_DATA = {
         },
         {
           id: "wg-03",
-          text: "해발고도 기준으로, 세계에서 가장 높은 산은?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 해발고도가 가장 높은 산은?",
           choices: ["에베레스트산", "K2", "칸첸중가", "킬리만자로산"],
           answer: 0,
-          explanation: "높이 8,849m로 네팔과 중국 국경에 걸쳐 있다.",
+          explanation: "2020년 네팔과 중국이 공동 측량으로 8,848.86m라고 발표했다.",
           source: { name: "Encyclopaedia Britannica 「Mount Everest」", url: "https://www.britannica.com/place/Mount-Everest" },
           verifiedAt: "2026-10-08"
         },
@@ -145,7 +145,7 @@ var QUIZ_DATA = {
         },
         {
           id: "wg-05",
-          text: "국토 면적 기준으로, 세계에서 가장 넓은 나라는?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 국토 면적이 가장 넓은 나라는?",
           choices: ["러시아", "캐나다", "중국", "미국"],
           answer: 0,
           explanation: "유럽 동부와 아시아 북부에 걸쳐 있다.",
@@ -154,10 +154,10 @@ var QUIZ_DATA = {
         },
         {
           id: "wg-06",
-          text: "최대 수심 기준으로, 세계에서 가장 깊은 호수는?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 최대 수심이 가장 깊은 호수는?",
           choices: ["바이칼호", "탕가니카호", "말라위호", "슈피리어호"],
           answer: 0,
-          explanation: "최대 수심이 약 1,620m이고 러시아 시베리아 남부에 있다.",
+          explanation: "러시아 시베리아 남부에 있으며 수심 값은 자료마다 다르게 적는다.",
           source: { name: "Encyclopaedia Britannica 「Lake Baikal」", url: "https://www.britannica.com/place/Lake-Baikal" },
           verifiedAt: "2026-10-08"
         },
@@ -190,7 +190,7 @@ var QUIZ_DATA = {
         },
         {
           id: "wg-10",
-          text: "면적 기준으로, 세계에서 가장 넓은 대양은?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 면적이 가장 넓은 대양은?",
           choices: ["태평양", "대서양", "인도양", "북극해"],
           answer: 0,
           explanation: "지구 표면의 약 3분의 1을 차지한다.",
@@ -205,7 +205,7 @@ var QUIZ_DATA = {
       questions: [
         {
           id: "sc-01",
-          text: "건조 공기의 부피 기준으로, 지구 대기에서 가장 많은 비율을 차지하는 기체는?",
+          text: "2026년 브리태니커 백과사전 기재 기준으로, 건조 공기의 부피에서 가장 많은 비율을 차지하는 기체는?",
           choices: ["질소", "산소", "아르곤", "이산화탄소"],
           answer: 0,
           explanation: "질소가 약 78.08%, 산소가 약 20.95%를 차지한다.",
@@ -214,7 +214,7 @@ var QUIZ_DATA = {
         },
         {
           id: "sc-02",
-          text: "진공에서의 빛의 속력 정의값 기준으로, 빛이 1초 동안 가는 거리에 가장 가까운 값은?",
+          text: "1983년에 고정된 빛의 속력 정의값 기준으로, 진공에서 빛이 1초 동안 가는 거리에 가장 가까운 값은?",
           choices: ["3천 km", "3만 km", "30만 km", "300만 km"],
           answer: 2,
           explanation: "진공에서의 빛의 속력은 299,792,458 m/s로 정의되어 있다.",
@@ -232,10 +232,10 @@ var QUIZ_DATA = {
         },
         {
           id: "sc-04",
-          text: "태양과의 평균 거리 기준으로, 태양계에서 태양에 가장 가까운 행성은?",
+          text: "2026년 NASA 자료 기준으로, 태양과의 평균 거리가 가장 가까운 행성은?",
           choices: ["수성", "금성", "지구", "화성"],
           answer: 0,
-          explanation: "태양계에서 가장 작은 행성이기도 하다.",
+          explanation: "태양 둘레를 약 88일 만에 한 바퀴 돈다.",
           source: { name: "NASA Science 「Mercury」", url: "https://science.nasa.gov/mercury/" },
           verifiedAt: "2026-10-08"
         },
@@ -277,7 +277,7 @@ var QUIZ_DATA = {
         },
         {
           id: "sc-09",
-          text: "지구 표면적 기준으로, 물이 덮고 있는 비율에 가장 가까운 값은?",
+          text: "2026년 미국 지질조사국(USGS) 자료 기준으로, 지구 표면에서 물이 덮고 있는 비율에 가장 가까운 값은?",
           choices: ["약 31%", "약 51%", "약 71%", "약 91%"],
           answer: 2,
           explanation: "지구 표면의 약 71%가 물로 덮여 있다.",
@@ -320,7 +320,7 @@ var QUIZ_DATA = {
         {
           id: "ac-03",
           text: "그림 〈진주 귀고리를 한 소녀〉를 그린 화가는?",
-          choices: ["요하네스 페르메이르", "렘브란트", "페테르 파울 루벤스", "안토니 반 다이크"],
+          choices: ["요하네스 페르메이르", "렘브란트 반 레인", "페테르 파울 루벤스", "안토니 반 다이크"],
           answer: 0,
           explanation: "네덜란드 헤이그의 마우리츠하위스가 소장하고 있다.",
           source: { name: "Mauritshuis 「Girl with a Pearl Earring」", url: "https://www.mauritshuis.nl/en/our-collection/artworks/670-girl-with-a-pearl-earring" },
@@ -373,8 +373,8 @@ var QUIZ_DATA = {
         },
         {
           id: "ac-09",
-          text: "사물놀이에 쓰이는 네 악기가 아닌 것은?",
-          choices: ["가야금", "꽹과리", "장구", "징"],
+          text: "사물놀이에서 꽹과리·장구·북과 함께 쓰이는 나머지 한 악기는?",
+          choices: ["징", "가야금", "해금", "아쟁"],
           answer: 0,
           explanation: "사물놀이는 꽹과리·징·장구·북 네 가지 농악기로 연주한다.",
           source: { name: "한국민족문화대백과사전 「사물놀이」", url: "https://encykorea.aks.ac.kr/Article/E0025605" },
