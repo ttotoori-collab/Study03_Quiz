@@ -31,6 +31,12 @@ body {
   padding: 24px 16px 48px;
 }
 
+.student {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 h1 { font-size: 1.75rem; margin: 0 0 8px; }
 h2 { font-size: 1.25rem; margin: 0 0 16px; }
 
@@ -124,6 +130,41 @@ button.primary {
 .choice.removed { opacity: 0.35; text-decoration: line-through; }
 
 .remaining { margin: 4px 0 0; color: var(--muted); }
+
+.save-form { margin: 16px 0; }
+.save-form label { display: block; margin-bottom: 8px; }
+.save-row { display: flex; gap: 8px; }
+
+.save-row input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.save-row button { flex: 0 0 auto; }
+
+.board { margin-bottom: 20px; }
+.board h3 { font-size: 1rem; margin: 0 0 8px; }
+.board table { width: 100%; border-collapse: collapse; background: var(--surface); }
+
+.board th,
+.board td {
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.board td:nth-child(2) { overflow-wrap: anywhere; }
+.board-empty { color: var(--muted); margin: 0; }
+
+#btn-board, #btn-board-back, #btn-start-back { width: 100%; text-align: center; }
 
 .question {
   font-size: 1.2rem;

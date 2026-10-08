@@ -11,6 +11,8 @@
 
 <main class="app">
 
+  <p class="student">2601926 김세란</p>
+
   <!-- 화면: 모드 선택 -->
   <section id="screen-mode" class="screen">
     <h1>상식 퀴즈</h1>
@@ -30,6 +32,7 @@
         <span>문항마다 힌트 1번, 힌트를 쓰고 맞히면 0.5점</span>
       </button>
     </div>
+    <button id="btn-board" type="button">순위표 보기</button>
   </section>
 
   <!-- 화면: 시작(카테고리 선택) -->
@@ -73,12 +76,29 @@
     <p id="result-score" class="score"></p>
     <p id="result-remaining" class="remaining hidden"></p>
     <p id="result-note" class="note hidden"></p>
+    <form id="save-form" class="save-form hidden">
+      <label for="save-name">이름 (12자까지)</label>
+      <div class="save-row">
+        <input id="save-name" type="text" maxlength="12" autocomplete="nickname">
+        <button id="btn-save" type="submit" class="primary">순위표에 저장</button>
+      </div>
+      <p id="save-result" class="note hidden"></p>
+    </form>
     <ol id="result-list" class="result-list"></ol>
     <div class="button-row">
       <button id="btn-retry-wrong" type="button" class="primary hidden">틀린 문제 다시 풀기</button>
       <button id="btn-retry-category" type="button" class="primary">같은 모드 다시</button>
+      <button id="btn-board-result" type="button">순위표</button>
       <button id="btn-to-start" type="button">처음으로</button>
     </div>
+  </section>
+
+  <!-- 화면: 순위표 -->
+  <section id="screen-board" class="screen hidden">
+    <h2>순위표</h2>
+    <p id="board-warning" class="note hidden">이 브라우저에서는 기록을 저장할 수 없습니다</p>
+    <div id="board-tables"></div>
+    <button id="btn-board-back" type="button">처음으로</button>
   </section>
 
 </main>

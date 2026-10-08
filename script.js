@@ -594,6 +594,18 @@ function renderResult() {
     remaining.classList.add("hidden");
   }
 
+  /* 순위표에 기록하는 모드의 첫 판에서만 이름 입력과 저장을 보인다. */
+  var saveForm = document.getElementById("save-form");
+  if (MODES[round.mode].leaderboard && !round.isReview) {
+    document.getElementById("save-name").value = "";
+    document.getElementById("btn-save").disabled = false;
+    document.getElementById("save-result").textContent = "";
+    document.getElementById("save-result").classList.add("hidden");
+    saveForm.classList.remove("hidden");
+  } else {
+    saveForm.classList.add("hidden");
+  }
+
   var retryWrong = document.getElementById("btn-retry-wrong");
   if (MODES[round.mode].retryWrong && wrongCount > 0) {
     retryWrong.classList.remove("hidden");
@@ -641,6 +653,87 @@ function renderResult() {
   showScreen("screen-result");
 }
 
+/* 순위표: leaderboard 가 참인 모드 × 카테고리로 표를 그린다.
+   모드 목록을 하드코딩하지 않고 MODES 에서 뽑는다. */
+function renderBoard() {
+  var data = loadScores();
+  var container = document.getElementById("board-tables");
+  container.textContent = "";
+
+  for (var mode in MODES) {
+    if (!MODES[mode].leaderboard) {
+      continue;
+    }
+    for (var c = 0; c < QUIZ_DATA.categories.length; c++) {
+      var category = QUIZ_DATA.categories[c];
+      container.appendChild(
+        buildBoardTable(mode, category, data.scores[scoreKey(mode, category.id)] || [])
+      );
+    }
+  }
+
+  var warning = document.getElementById("board-warning");
+  if (canPersist) {
+    warning.classList.add("hidden");
+  } else {
+    warning.classList.remove("hidden");
+  }
+}
+
+function buildBoardTable(mode, category, entries) {
+  var box = document.createElement("section");
+  box.className = "board";
+
+  var title = document.createElement("h3");
+  title.textContent = MODES[mode].name + " · " + category.name;
+  box.appendChild(title);
+
+  var ranked = rankScores(entries);
+  if (ranked.length === 0) {
+    var empty = document.createElement("p");
+    empty.className = "board-empty";
+    empty.textContent = "기록 없음";
+    box.appendChild(empty);
+    return box;
+  }
+
+  var table = document.createElement("table");
+  var headRow = document.createElement("tr");
+  var headings = ["순위", "이름", "점수", "날짜"];
+  for (var h = 0; h < headings.length; h++) {
+    var th = document.createElement("th");
+    th.textContent = headings[h];
+    headRow.appendChild(th);
+  }
+  table.appendChild(headRow);
+
+  for (var i = 0; i < ranked.length; i++) {
+    var row = document.createElement("tr");
+    /* 이름은 textContent 로만 넣는다 — 입력한 문자가 HTML 로 해석되지 않게 한다. */
+    var cells = [
+      String(i + 1),
+      ranked[i].name,
+      formatScore(ranked[i].score),
+      ranked[i].at.slice(0, 10) + " " + ranked[i].at.slice(11, 16)
+    ];
+    for (var k = 0; k < cells.length; k++) {
+      var td = document.createElement("td");
+      td.textContent = cells[k];
+      row.appendChild(td);
+    }
+    table.appendChild(row);
+  }
+
+  box.appendChild(table);
+  return box;
+}
+
+function showBoard() {
+  stopTimer();
+  renderBoard();
+  showScreen("screen-board");
+}
+
 function bindEvents() {
   document.getElementById("screen-mode").addEventListener("click", function (event) {
     var button = event.target.closest("[data-mode]");
@@ -656,9 +749,40 @@ function bindEvents() {
     showScreen("screen-mode");
   });
 
+  document.getElementById("btn-board").addEventListener("click", showBoard);
+  document.getElementById("btn-board-result").addEventListener("click", showBoard);
+
+  document.getElementById("btn-board-back").addEventListener("click", function () {
+    showScreen("screen-mode");
+  });
+
   document.getElementById("btn-hint").addEventListener("click", applyHint);
 
   document.getElementById("btn-retry-wrong").addEventListener("click", startReviewRound);
+
+  /* 저장은 한 판에 한 번만 된다 (PRD §6). */
+  document.getElementById("save-form").addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    var button = document.getElementById("btn-save");
+    if (button.disabled) {
+      return;
+    }
+    button.disabled = true;
+
+    var name = normalizeName(document.getElementById("save-name").value);
+    var saved = saveScore(scoreKey(round.mode, round.categoryId), {
+      name: name,
+      score: totalScore(round),
+      at: nowKst()
+    });
+
+    var message = document.getElementById("save-result");
+    message.textContent = saved
+      ? name + " 으로 저장했습니다"
+      : "이 브라우저에서는 기록을 저장할 수 없습니다";
+    message.classList.remove("hidden");
+  });
 
   document.getElementById("screen-start").addEventListener("click", function (event) {
     var button = event.target.closest("[data-category-id]");
