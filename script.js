@@ -127,6 +127,91 @@ function pickHintChoices(question) {
   return shuffle(wrong).slice(0, 2);
 }
 
+/* ── 순위표 영속성 (PRD §4) ─────────────────────────────────────── */
+
+var STORAGE_KEY = "quiz.v1";
+var SCORE_LIMIT = 5;
+var canPersist = true;
+
+function scoreKey(mode, categoryId) {
+  return mode + "|" + categoryId;
+}
+
+/* score 내림차순, 동점이면 at 오름차순(먼저 세운 기록이 위), 상위 5건만. */
+function rankScores(entries) {
+  var sorted = entries.slice().sort(function (a, b) {
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+    if (a.at < b.at) {
+      return -1;
+    }
+    if (a.at > b.at) {
+      return 1;
+    }
+    return 0;
+  });
+  return sorted.slice(0, SCORE_LIMIT);
+}
+
+/* 읽기 예외·파싱 실패·version 불일치는 조용히 버리고 빈 순위표를 돌려준다. */
+function loadScores() {
+  var empty = { version: 1, scores: {} };
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return empty;
+    }
+    var data = JSON.parse(raw);
+    if (!data || data.version !== 1 || !data.scores) {
+      return empty;
+    }
+    return data;
+  } catch (error) {
+    return empty;
+  }
+}
+
+/* 쓰기 성공 여부를 돌려준다. 예외를 밖으로 던지지 않는다 — 저장이 안 돼도
+   퀴즈는 정상 동작해야 한다 (PRD §4). */
+function saveScore(key, entry) {
+  var data = loadScores();
+
+  if (!data.scores[key]) {
+    data.scores[key] = [];
+  }
+  data.scores[key].push(entry);
+  data.scores[key] = rankScores(data.scores[key]);
+
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
+  } catch (error) {
+    canPersist = false;
+    return false;
+  }
+}
+
+/* 앞뒤 공백을 떼고 12자로 자른다. 비면 익명. */
+function normalizeName(raw) {
+  var name = String(raw === null || raw === undefined ? "" : raw).trim().slice(0, 12);
+  return name === "" ? "익명" : name;
+}
+
+/* KST 오프셋을 포함한 ISO 문자열. 예: 2026-10-08T14:22:10+09:00 */
+function nowKst() {
+  var now = new Date();
+  var kst = new Date(now.getTime() + (9 * 60 + now.getTimezoneOffset()) * 60000);
+
+  function pad(n) {
+    return (n < 10 ? "0" : "") + n;
+  }
+
+  return kst.getFullYear() + "-" + pad(kst.getMonth() + 1) + "-" + pad(kst.getDate())
+    + "T" + pad(kst.getHours()) + ":" + pad(kst.getMinutes()) + ":" + pad(kst.getSeconds())
+    + "+09:00";
+}
+
 /* 라운드 → 틀린 문항의 원본 배열 (복습 라운드의 입력). */
 function collectWrong(playedRound) {
   var questions = getCategory(playedRound.categoryId).questions;
