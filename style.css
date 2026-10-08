@@ -1,0 +1,131 @@
+:root {
+  --bg: #f5f5f4;
+  --card: #ffffff;
+  --ink: #1c1917;
+  --muted: #78716c;
+  --line: #e7e5e4;
+  --accent: #1d4ed8;
+  --correct: #15803d;
+  --correct-bg: #dcfce7;
+  --wrong: #b91c1c;
+  --wrong-bg: #fee2e2;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 24px 16px;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.app {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.screen {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.hidden { display: none; }
+
+h1 { font-size: 1.6rem; margin: 0 0 4px; }
+h2 { font-size: 1.15rem; margin: 20px 0 12px; }
+
+.mode-line { margin: 0; color: var(--muted); font-size: 0.9rem; }
+
+.note {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  background: var(--bg);
+  border-left: 3px solid var(--muted);
+  border-radius: 4px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.button-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+button {
+  font: inherit;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--card);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { cursor: default; }
+
+button.primary {
+  text-align: center;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+button.primary:hover:not(:disabled) { filter: brightness(1.1); }
+
+/* 퀴즈 */
+.progress { margin: 0; color: var(--muted); font-size: 0.9rem; }
+.question { font-size: 1.1rem; margin: 8px 0 16px; }
+
+#choice-list button.is-correct {
+  background: var(--correct-bg);
+  border-color: var(--correct);
+  color: var(--correct);
+  font-weight: 600;
+}
+
+#choice-list button.is-wrong {
+  background: var(--wrong-bg);
+  border-color: var(--wrong);
+  color: var(--wrong);
+}
+
+.feedback {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.verdict { margin: 0 0 6px; font-weight: 700; }
+.verdict.is-correct { color: var(--correct); }
+.verdict.is-wrong { color: var(--wrong); }
+
+.explanation { margin: 0; }
+
+.source { margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); }
+.source a { color: var(--muted); }
+
+#btn-next { margin-top: 16px; width: 100%; }
+
+/* 결과 */
+.score { font-size: 1.6rem; font-weight: 700; margin: 0; }
+
+.result-list {
+  margin: 16px 0 20px;
+  padding-left: 20px;
+}
+
+.result-list li { margin-bottom: 8px; }
+
+.result-list .mark { font-weight: 700; margin-right: 6px; }
+.result-list .mark.is-correct { color: var(--correct); }
+.result-list .mark.is-wrong { color: var(--wrong); }
