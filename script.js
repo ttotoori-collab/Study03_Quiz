@@ -118,6 +118,51 @@ function formatScore(n) {
    3. 라운드 엔진
    ==================================================================== */
 
+var round = null;
+
+function startRound(mode, categoryId) {
+  round = buildRound(mode, categoryId, getCategory(categoryId).questions);
+  showScreen("screen-quiz");
+  renderQuestion();
+}
+
+/* 문항 하나를 확정한다. choiceIndex 는 숫자 또는 null(시간 초과).
+   먼저 확정된 쪽만 반영한다 (PRD §7). */
+function commitAnswer(choiceIndex, timedOut) {
+  if (round.answered) {
+    return;
+  }
+  round.answered = true;
+
+  var question = round.questions[round.index];
+  var correct = !timedOut && choiceIndex === question.answer;
+  var outcome = { correct: correct, usedHint: round.usedHint, timedOut: !!timedOut };
+
+  round.results.push({
+    questionId: question.id,
+    correct: correct,
+    usedHint: round.usedHint,
+    timedOut: !!timedOut,
+    score: scoreAnswer(round.mode, outcome)
+  });
+
+  renderFeedback(choiceIndex, correct, !!timedOut);
+}
+
+function goNext() {
+  /* 확정되지 않은 문항에서는 넘어가지 않는다 — 연타로 문항 두 개를
+     건너뛰는 사고를 막는다 (PRD §7). */
+  if (!round.answered) {
+    return;
+  }
+  if (round.index >= round.questions.length - 1) {
+    renderResult();
+    return;
+  }
+  round.index += 1;
+  renderQuestion();
+}
+
 /* ====================================================================
    4. 화면 전환
    ==================================================================== */
@@ -137,8 +182,94 @@ function showScreen(id) {
    5. DOM 렌더링과 이벤트 연결
    ==================================================================== */
 
+function renderQuestion() {
+  var question = round.questions[round.index];
+
+  round.answered = false;
+  round.usedHint = false;
+
+  document.getElementById("quiz-progress").textContent =
+    (round.index + 1) + " / " + round.questions.length;
+  document.getElementById("quiz-text").textContent = question.text;
+
+  var list = document.getElementById("choice-list");
+  list.textContent = "";
+  for (var i = 0; i < question.choices.length; i++) {
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "choice";
+    button.textContent = question.choices[i];
+    button.dataset.choiceIndex = String(i);
+    list.appendChild(button);
+  }
+
+  document.getElementById("feedback").classList.add("hidden");
+
+  var next = document.getElementById("btn-next");
+  next.classList.add("hidden");
+  next.disabled = false;
+}
+
+/* 정답 여부 → 한 줄 해설 → 출처 행 → [다음].
+   시간 초과도 같은 화면을 띄운다 (PRD §6). */
+function renderFeedback(choiceIndex, correct, timedOut) {
+  var question = round.questions[round.index];
+  var buttons = document.getElementById("choice-list").children;
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].disabled = true;
+  }
+  buttons[question.answer].classList.add("is-correct");
+  if (!correct && choiceIndex !== null && choiceIndex !== undefined) {
+    buttons[choiceIndex].classList.add("is-wrong");
+  }
+
+  var verdict = document.getElementById("feedback-verdict");
+  if (correct) {
+    verdict.textContent = "정답입니다";
+  } else if (timedOut) {
+    verdict.textContent = "시간 초과입니다";
+  } else {
+    verdict.textContent = "틀렸습니다";
+  }
+  verdict.className = "verdict " + (correct ? "is-correct" : "is-wrong");
+
+  document.getElementById("feedback-explanation").textContent = question.explanation;
+
+  var source = document.getElementById("feedback-source");
+  source.textContent = question.source.name;
+  source.href = question.source.url;
+
+  document.getElementById("feedback").classList.remove("hidden");
+  document.getElementById("btn-next").classList.remove("hidden");
+}
+
+function bindEvents() {
+  document.getElementById("screen-start").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-category-id]");
+    if (!button) {
+      return;
+    }
+    startRound("practice", button.dataset.categoryId);
+  });
+
+  document.getElementById("choice-list").addEventListener("click", function (event) {
+    var button = event.target.closest("button");
+    if (!button || button.disabled) {
+      return;
+    }
+    commitAnswer(Number(button.dataset.choiceIndex), false);
+  });
+
+  document.getElementById("btn-next").addEventListener("click", function () {
+    document.getElementById("btn-next").disabled = true;
+    goNext();
+  });
+}
+
 /* ====================================================================
    6. 초기화
    ==================================================================== */
 
+bindEvents();
 showScreen("screen-start");
