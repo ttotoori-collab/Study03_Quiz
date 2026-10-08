@@ -31,6 +31,12 @@ body {
   padding: 24px 16px 48px;
 }
 
+.student {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 h1 { font-size: 1.75rem; margin: 0 0 8px; }
 h2 { font-size: 1.25rem; margin: 0 0 16px; }
 
@@ -157,6 +163,8 @@ button.primary {
 
 .board td:nth-child(2) { overflow-wrap: anywhere; }
 .board-empty { color: var(--muted); margin: 0; }
+
+#btn-board, #btn-board-back, #btn-start-back { width: 100%; text-align: center; }
 
 .question {
   font-size: 1.2rem;
