@@ -244,6 +244,38 @@ function renderFeedback(choiceIndex, correct, timedOut) {
   document.getElementById("btn-next").classList.remove("hidden");
 }
 
+/* 점수, 문항별 정오 목록, 순위표 기록 여부 안내.
+   만점은 그 판의 문항 수에서 가져온다 (PRD §6). */
+function renderResult() {
+  document.getElementById("result-score").textContent =
+    formatScore(totalScore(round)) + " / " + round.questions.length;
+
+  var list = document.getElementById("result-list");
+  list.textContent = "";
+  for (var i = 0; i < round.results.length; i++) {
+    var item = document.createElement("li");
+
+    var mark = document.createElement("span");
+    mark.className = "mark " + (round.results[i].correct ? "is-correct" : "is-wrong");
+    mark.textContent = round.results[i].correct ? "맞힘" : "틀림";
+
+    item.appendChild(mark);
+    item.appendChild(document.createTextNode(round.questions[i].text));
+    list.appendChild(item);
+  }
+
+  var note = document.getElementById("result-note");
+  if (MODES[round.mode].leaderboard) {
+    note.textContent = "";
+    note.classList.add("hidden");
+  } else {
+    note.textContent = MODES[round.mode].name + " 모드는 순위표에 기록되지 않음";
+    note.classList.remove("hidden");
+  }
+
+  showScreen("screen-result");
+}
+
 function bindEvents() {
   document.getElementById("screen-start").addEventListener("click", function (event) {
     var button = event.target.closest("[data-category-id]");
@@ -264,6 +296,14 @@ function bindEvents() {
   document.getElementById("btn-next").addEventListener("click", function () {
     document.getElementById("btn-next").disabled = true;
     goNext();
+  });
+
+  document.getElementById("btn-retry-category").addEventListener("click", function () {
+    startRound(round.mode, round.categoryId);
+  });
+
+  document.getElementById("btn-to-start").addEventListener("click", function () {
+    showScreen("screen-start");
   });
 }
 
